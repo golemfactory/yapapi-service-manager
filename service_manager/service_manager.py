@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 DEFAULT_EXECUTOR_CFG = {
     'budget': 1.0,
-    'subnet_tag': 'erigon',
+    'subnet_tag': 'devnet-beta.2',
     'event_consumer': log_summary(log_event_repr),
 }
 
