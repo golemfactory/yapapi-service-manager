@@ -22,8 +22,21 @@ $ echo "print('test')" | python shell.py write
 Read one line from stdout:
 ```shell
 $ python shell.py read
->>> test
+test
+>>>
 ```
 
 If not output is available, `read` command will wait indefinitely.
 If the Python shell has exited it will exit without printing anything.
+
+Run full interactive shell:
+```shell
+$ ./run_shell.sh 
+>>> x = 1
+>>> x
+1
+>>> x += 2
+>>> x
+3
+>>> exit()
+```
