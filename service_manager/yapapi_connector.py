@@ -1,4 +1,4 @@
-from yapapi.executor import Golem
+from yapapi import Golem
 import asyncio
 
 from typing import TYPE_CHECKING
@@ -7,8 +7,9 @@ if TYPE_CHECKING:
 
 
 class YapapiConnector():
-    def __init__(self, executor_cfg: dict):
+    def __init__(self, executor_cfg: dict, exception_handler):
         self.executor_cfg = executor_cfg
+        self._exception_handler = exception_handler
 
         self.command_queue = asyncio.Queue()
         self.run_service_tasks = []
@@ -28,12 +29,22 @@ class YapapiConnector():
         for task in self.run_service_tasks:
             task.cancel()
 
-        await self.executor_task
+        if self.executor_task is not None:
+            #   NOTE: we're not cancelling the task because we want Golem to exit gracefully (__aexit__)
+            #   TODO: is this really necessary?
+            await self.executor_task
 
     async def run(self):
+        try:
+            await self._run_golem()
+        except Exception as e:
+            await self._exception_handler(e)
+
+    async def _run_golem(self):
         async with Golem(**self.executor_cfg) as golem:
+            subnet_tag = self.executor_cfg.get('subnet_tag', '')
             print(
-                f"Using subnet: {self.executor_cfg['subnet_tag']}  "
+                f"Using subnet: {subnet_tag}  "
                 f"payment driver: {golem.driver}  "
                 f"network: {golem.network}\n"
             )
@@ -48,6 +59,13 @@ class YapapiConnector():
 
     async def _run_service(self, golem: Golem, service_wrapper: 'ServiceWrapper'):
         cluster = await golem.run_service(service_wrapper.service_cls)
+
+        #   TODO: this will change when yapapi issue 372 is fixed
+        cluster.instance_start_args = service_wrapper.start_args
+
+        #   TODO: this will be removed when yapapi issue 461 is fixed
+        #         (currently the cluster is "fully operable" only after all instances started)
         while not cluster.instances:
             await asyncio.sleep(0.1)
-        service_wrapper.service = cluster.instances[0]
+
+        service_wrapper.cluster = cluster

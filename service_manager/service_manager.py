@@ -1,39 +1,40 @@
 import asyncio
-from yapapi.log import enable_default_logger, log_summary, log_event_repr
+from yapapi.log import enable_default_logger
 from .service_wrapper import ServiceWrapper
 from .yapapi_connector import YapapiConnector
+from functools import partial
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Type
+    from typing import Type, List, Any, Coroutine
     from yapapi.executor.services import Service
 
 
-DEFAULT_EXECUTOR_CFG = {
-    'budget': 1.0,
-    'subnet_tag': 'devnet-beta.2',
-    'event_consumer': log_summary(log_event_repr),
-}
+async def stop_on_golem_exception(service_manager, e):
+    print("GOLEM FAILED\n", e)
+    print("STOPPING THE LOOP")
+    loop = asyncio.get_event_loop()
+    loop.stop()
 
 
 class ServiceManager():
-    def __init__(self, user_executor_cfg={}):
-        executor_cfg = DEFAULT_EXECUTOR_CFG.copy()
-        executor_cfg.update(user_executor_cfg)
+    def __init__(self, executor_cfg: dict,
+                 golem_exception_handler: 'Coroutine[ServiceManager, Exception]' = stop_on_golem_exception,
+                 log_file: str = 'log.log'):
+        enable_default_logger(log_file=log_file)
 
-        self.yapapi_connector = YapapiConnector(executor_cfg)
         self.service_wrappers = []
+        exception_handler = partial(golem_exception_handler, self)
+        self.yapapi_connector = YapapiConnector(executor_cfg, exception_handler)
 
-        enable_default_logger(log_file='log.log')
-
-    def create_service(self, service_cls: 'Type[Service]', start_params: dict = {}):
-        #   TODO: stop ignoring start_params
-        service_wrapper = ServiceWrapper(service_cls)
+    def create_service(self, service_cls: 'Type[Service]', start_args: 'List[Any]' = [],
+                       service_wrapper_cls: 'Type[ServiceWrapper]' = ServiceWrapper):
+        service_wrapper = service_wrapper_cls(service_cls, start_args)
         self.yapapi_connector.create_instance(service_wrapper)
         self.service_wrappers.append(service_wrapper)
         return service_wrapper
 
     async def close(self):
-        tasks = [service_wrapper.stop() for service_wrapper in self.service_wrappers]
-        await asyncio.gather(*tasks)
+        for service_wrapper in self.service_wrappers:
+            service_wrapper.stop()
         await self.yapapi_connector.stop()
