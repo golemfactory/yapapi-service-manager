@@ -7,6 +7,10 @@ from service_manager import ServiceManager
 
 
 class ProviderClock(Service):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.command_executed_cnt = 0
+
     @classmethod
     async def get_payload(cls):
         #   We use a "standard" yapapi blender image (because every provider has it downloaded)
@@ -28,6 +32,7 @@ class ProviderClock(Service):
             this_result = all_results[-1]
 
             print(f"My name {self.provider_name} and my time is {this_result.stdout}")
+            self.command_executed_cnt += 1
             await asyncio.sleep(1)
 
 
@@ -39,7 +44,8 @@ async def main(service_manager):
         await asyncio.sleep(1)
 
     print("Hey provider, what's the time?")
-    await asyncio.sleep(7)
+    while clock.service.command_executed_cnt < 3:
+        await asyncio.sleep(1)
 
     print("OK, that's enough, thanks buddy")
     clock.stop()
