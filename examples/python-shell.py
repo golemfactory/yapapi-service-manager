@@ -1,4 +1,6 @@
 import asyncio
+import sys
+import shlex
 
 from yapapi.payload import vm
 from yapapi.services import Service
@@ -9,41 +11,58 @@ from service_manager import ServiceManager
 class PythonShell(Service):
     @classmethod
     async def get_payload(cls):
-        #   This image is based on examples/python-shell/provider/Dockerfile
-        #   created & pushed the way described in docs:
+        #   This image is created from examples/python-shell/provider/Dockerfile the way described here:
         #   https://handbook.golem.network/requestor-tutorials/hello-world#building-and-publishing-the-image
         image_hash = "4c68e8d799acfa105a6b7b3553fcee2afa7f474b7aa4ce6a29f01d9e"
         return await vm.repo(image_hash=image_hash)
 
     async def start(self):
+        print(f"Initializing shell on provider {self.provider_name}, wait for prompt ...")
         self._ctx.run('/bin/sh', '-c', 'nohup python shell.py run &')
         yield self._ctx.commit()
+        print("Python shell is ready.")
 
     async def run(self):
-        print("RUNNING")
-
         while True:
-            self._ctx.run('/bin/sh', '-c', "echo 'x=1' | python shell.py write")
+            #   Print python shell optupt
             self._ctx.run('/usr/local/bin/python', 'shell.py', 'read')
-            self._ctx.run('/bin/sh', '-c', "echo 'y=2' | python shell.py write")
-            self._ctx.run('/usr/local/bin/python', 'shell.py', 'read')
-            self._ctx.run('/bin/sh', '-c', "echo 'x+y' | python shell.py write")
-            self._ctx.run('/usr/local/bin/python', 'shell.py', 'read')
-            future_result = yield self._ctx.commit()
-            all_results = future_result.result()
-            this_result = all_results[-1]
-            print(this_result.stdout)
+            future_results = yield self._ctx.commit()
+            result = future_results.result()[-1]
+            print(result.stdout, end='', flush=True)
+
+            #   Pass command to shell
+            signal = await self._listen()
+            cmd = signal.message
+            cmd = shlex.quote(cmd)
+            self._ctx.run('/bin/sh', '-c', f"echo {cmd} | python shell.py write")
+            yield self._ctx.commit()
+
+
+async def async_stdin_reader():
+    loop = asyncio.get_event_loop()
+    reader = asyncio.StreamReader()
+    protocol = asyncio.StreamReaderProtocol(reader)
+    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
+    return reader
 
 
 async def main(service_manager):
     shell = service_manager.create_service(PythonShell)
 
-    while not shell.started:
+    #   TODO
+    #   ServiceWrapper should have a "state" property that would use
+    #   *   started/stopped on SeviceWrapper
+    #   *   service.state
+    #   so this would be prettier
+    while not shell.started or not shell.service.state.value == 'running':
         print("Waiting for the service to start")
         await asyncio.sleep(1)
 
-    print("Shell starts")
-    await asyncio.Future()
+    reader = await async_stdin_reader()
+    while True:
+        line = await reader.read(10000)
+        line = line.decode()
+        shell.service.send_message_nowait(line)
 
 
 if __name__ == '__main__':
