@@ -24,7 +24,7 @@ class PythonShell(Service):
 
     async def run(self):
         while True:
-            #   Print python shell optupt
+            #   Print python shell output
             self._ctx.run('/usr/local/bin/python', 'shell.py', 'read')
             future_results = yield self._ctx.commit()
             result = future_results.result()[-1]
@@ -53,7 +53,7 @@ async def main(service_manager):
     #   ServiceWrapper should have a "state" property that would use
     #   *   started/stopped on SeviceWrapper
     #   *   service.state
-    #   so this would be prettier
+    #   so this would be prettier.
     while not shell.started or not shell.service.state.value == 'running':
         print("Waiting for the service to start")
         await asyncio.sleep(1)
