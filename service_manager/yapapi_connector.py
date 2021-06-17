@@ -3,17 +3,19 @@ import asyncio
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from typing import List, Optional, Callable, Awaitable
     from .service_wrapper import ServiceWrapper
+    from .service_manager import ServiceManager
 
 
 class YapapiConnector():
-    def __init__(self, executor_cfg: dict, exception_handler):
+    def __init__(self, executor_cfg: dict, exception_handler: 'Callable[[ServiceManager, Exception], Awaitable[None]]'):
         self.executor_cfg = executor_cfg
         self._exception_handler = exception_handler
 
-        self.command_queue = asyncio.Queue()
-        self.run_service_tasks = []
-        self.executor_task = None
+        self.command_queue: 'asyncio.Queue' = asyncio.Queue()
+        self.run_service_tasks: 'List[asyncio.Task]' = []
+        self.executor_task: 'Optional[asyncio.Task]' = None
 
     def create_instance(self, service_wrapper: 'ServiceWrapper'):
         if self.executor_task is None:

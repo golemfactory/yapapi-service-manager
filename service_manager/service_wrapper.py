@@ -2,7 +2,7 @@ import uuid
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Type, List, Any
+    from typing import Type, List, Any, Optional
     from yapapi.services import Service, Cluster
 
 
@@ -12,7 +12,7 @@ class ServiceWrapper():
         self.start_args = start_args
         self.id = self._create_id()
         self.stopped = False
-        self._cluster = None
+        self._cluster: 'Optional[Cluster]' = None
 
     @property
     def cluster(self):
