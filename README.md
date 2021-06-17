@@ -52,6 +52,38 @@ $ python3 examples/python-shell.py
 ## API reference
 
 
+```
+service_manager = ServiceManager(
+    # Dictionary with yapapi.Executor config (TODO: link yayapi executor config docs)
+    executor_cfg,  
+    
+    # Handler function executed when yapapi.Executor raises an exception
+    # Default handler just stops the current event loop
+    golem_exception_handler=some_default_handler,
+    
+    log_file='log.log',
+)
+
+service_wrapper = service_manager.create_service(
+    # Service implementation, class inheriting from yapapi.services.Service
+    service_cls,
+    
+    # Arguments that will be passed to the runtime start.
+    # This currenly makes sense only for self-contained runtimes --> Erigon example
+    start_args=[],
+
+    # Class inheriting from service_manager.ServiceWrapper, type of the object
+    # returned by this function. Sample usage --> Erigon example
+    service_wrapper_cls=service_manager.ServiceWrapper,
+)
+
+service_wrapper.stop()   # Stop the service. This terminates the agreement.
+service_wrapper.started  # True -> we've signed an agreement -> service starts (or started)
+service_wrapper.stopped  # True -> something stopped our service_wrapper -> it's not running
+service_wrapper.service  # Instance of service_cls
+
+await service_manager.close()  # Close the Executor, stop all Golem-related work
+```
 
 ## Known issues
 
