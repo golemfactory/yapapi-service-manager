@@ -53,17 +53,20 @@ $ python3 examples/python-shell.py
 
 
 ```
+#   Initialize the ServiceManager. You should never have more than one active ServiceManager.
 service_manager = ServiceManager(
     # Dictionary with yapapi.Executor config (TODO: link yayapi executor config docs)
     executor_cfg,  
     
     # Handler function executed when yapapi.Executor raises an exception
     # Default handler just stops the current event loop
-    golem_exception_handler=some_default_handler,
+    golem_exception_handler=service_manager.stop_on_golem_exception,
     
     log_file='log.log',
 )
 
+#   Request service creation. From yapapi POV, this creates a single-instance cluster.
+#   (TODO: link to yapapi docs)
 service_wrapper = service_manager.create_service(
     # Service implementation, class inheriting from yapapi.services.Service
     service_cls,
