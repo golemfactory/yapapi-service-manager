@@ -5,7 +5,7 @@ Helper tool for management of [Golem](https://handbook.golem.network/)-based ser
 ## yapapi-service-manager vs yapapi
 
 The official Golem python requestor development library is [yapapi](https://github.com/golemfactory/yapapi).
-`yayapi` is used internally in `yapapi-service-manager`, so there's exactly nothing `yayapi-service-manager` can do that is not available in pure `yapapi`.
+`yayapi` is used internally in `yapapi-service-manager`, so there's exactly nothing this library can do that is not available in pure `yapapi`.
 
 `yapapi-service-manager` provides a higher-level services API than `yapapi`. Main features:
 
@@ -31,16 +31,22 @@ In the long term, `yapapi-service-manager` will either be merged into `yapapi` (
 
 1. Simple service that just prints provider time few times. This is pretty useless, just demonstrates the base usage.
 
-    $ python3 examples/clock.py
+
+```
+$ python3 examples/clock.py
+```
 
 2. "Standard" interactive python console, but running on a provider machine.
    
-    $ python3 examples/python-shell.py
 
-3.  More complex usage: [Erigon](https://github.com/golemfactory/yagna-service-erigon). Features
+```
+$ python3 examples/python-shell.py
+```
 
-    * custom runtime (TODO: runtime docs url)
-    * `yapapi-service-manager` integrated with [Quart](https://pgjones.gitlab.io/quart/) http server
+3.  More complex usage: [Erigon](https://github.com/golemfactory/yagna-service-erigon). Features:
+
+* custom runtime (TODO: runtime docs url)
+* `yapapi-service-manager` integrated with [Quart](https://pgjones.gitlab.io/quart/) http server
     
 
 ## API reference
