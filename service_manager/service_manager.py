@@ -21,7 +21,7 @@ class ServiceManager():
     def __init__(
         self,
         executor_cfg: dict,
-        golem_exception_handler: 'Callable[[ServiceManager, Exception], Awaitable[None]]' = stop_on_golem_exception,
+        golem_exception_handler: 'Callable[[ServiceManager, Exception], Awaitable[Any]]' = stop_on_golem_exception,
         log_file: str = 'log.log'
     ):
         enable_default_logger(log_file=log_file)
