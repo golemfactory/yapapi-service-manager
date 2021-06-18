@@ -30,13 +30,14 @@ class ProviderClock(Service):
             #   all_results might contain also results of deploy() and start() operations (for the first iteration)
             #   but this particular operation is always last
             this_result = all_results[-1]
+            date_time = this_result.stdout.strip()
 
-            print(f"My name {self.provider_name} and my time is {this_result.stdout}")
+            print(f"My name is {self.provider_name} and my time is {date_time}")
             self.command_executed_cnt += 1
             await asyncio.sleep(1)
 
 
-async def main(service_manager):
+async def run_service(service_manager):
     clock = service_manager.create_service(ProviderClock)
 
     while not clock.started:
@@ -53,7 +54,7 @@ async def main(service_manager):
     await service_manager.close()
 
 
-if __name__ == '__main__':
+def main():
     executor_cfg = {
         'subnet_tag': 'devnet-beta.2',
         'budget': 1,
@@ -61,9 +62,13 @@ if __name__ == '__main__':
     service_manager = ServiceManager(executor_cfg)
     try:
         loop = asyncio.get_event_loop()
-        main_task = loop.create_task(main(service_manager))
-        loop.run_until_complete(main_task)
+        run_service_task = loop.create_task(run_service(service_manager))
+        loop.run_until_complete(run_service_task)
     except KeyboardInterrupt:
         shutdown = loop.create_task(service_manager.close())
         loop.run_until_complete(shutdown)
-        main_task.cancel()
+        run_service_task.cancel()
+
+
+if __name__ == '__main__':
+    main()

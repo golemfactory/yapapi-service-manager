@@ -46,7 +46,7 @@ async def async_stdin_reader():
     return reader
 
 
-async def main(service_manager):
+async def run_service(service_manager):
     shell = service_manager.create_service(PythonShell)
 
     #   TODO
@@ -65,7 +65,7 @@ async def main(service_manager):
         shell.service.send_message_nowait(line)
 
 
-if __name__ == '__main__':
+def main():
     executor_cfg = {
         'subnet_tag': 'devnet-beta.2',
         'budget': 1,
@@ -73,9 +73,13 @@ if __name__ == '__main__':
     service_manager = ServiceManager(executor_cfg)
     try:
         loop = asyncio.get_event_loop()
-        main_task = loop.create_task(main(service_manager))
-        loop.run_until_complete(main_task)
+        run_service_task = loop.create_task(run_service(service_manager))
+        loop.run_until_complete(run_service_task)
     except KeyboardInterrupt:
         shutdown = loop.create_task(service_manager.close())
         loop.run_until_complete(shutdown)
-        main_task.cancel()
+        run_service_task.cancel()
+
+
+if __name__ == '__main__':
+    main()
