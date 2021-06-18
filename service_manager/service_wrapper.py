@@ -2,12 +2,12 @@ import uuid
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Type, List, Any, Optional
+    from typing import Type, Tuple, Optional
     from yapapi.services import Service, Cluster
 
 
 class ServiceWrapper():
-    def __init__(self, service_cls: 'Type[Service]', start_args: 'List[Any]'):
+    def __init__(self, service_cls: 'Type[Service]', start_args: 'Tuple'):
         self.service_cls = service_cls
         self.start_args = start_args
         self.id = self._create_id()

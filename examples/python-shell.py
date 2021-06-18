@@ -11,8 +11,8 @@ from service_manager import ServiceManager
 class PythonShell(Service):
     @classmethod
     async def get_payload(cls):
-        #   This image is created from examples/python-shell/provider/Dockerfile the way described here:
-        #   https://handbook.golem.network/requestor-tutorials/hello-world#building-and-publishing-the-image
+        #   This image is created from examples/python-shell/provider/Dockerfile and pushed as described here:
+        #   https://handbook.golem.network/requestor-tutorials/convert-a-docker-image-into-a-golem-image
         image_hash = "4c68e8d799acfa105a6b7b3553fcee2afa7f474b7aa4ce6a29f01d9e"
         return await vm.repo(image_hash=image_hash)
 
@@ -60,7 +60,7 @@ async def run_service(service_manager):
 
     reader = await async_stdin_reader()
     while True:
-        line = await reader.read(10000)
+        line = await reader.readline()
         line = line.decode()
         shell.service.send_message_nowait(line)
 

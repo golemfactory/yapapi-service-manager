@@ -49,10 +49,10 @@ $ python3 examples/python-shell.py
 * `yapapi-service-manager` integrated with [Quart](https://pgjones.gitlab.io/quart/) http server
     
 
-## API reference
+## Quickstart
 
 
-```
+```python
 #   Initialize the ServiceManager. You should never have more than one active ServiceManager.
 service_manager = ServiceManager(
     # Dictionary with yapapi.Executor config (TODO: link yayapi executor config docs)

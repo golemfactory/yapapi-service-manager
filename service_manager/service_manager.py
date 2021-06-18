@@ -1,12 +1,14 @@
 import asyncio
+from functools import partial
+
 from yapapi.log import enable_default_logger
+
 from .service_wrapper import ServiceWrapper
 from .yapapi_connector import YapapiConnector
-from functools import partial
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Type, List, Any, Callable, Awaitable
+    from typing import Type, List, Tuple, Callable, Awaitable
     from yapapi.services import Service
 
 
@@ -30,8 +32,12 @@ class ServiceManager():
         exception_handler = partial(golem_exception_handler, self)
         self.yapapi_connector = YapapiConnector(executor_cfg, exception_handler)
 
-    def create_service(self, service_cls: 'Type[Service]', start_args: 'List[Any]' = [],
-                       service_wrapper_cls: 'Type[ServiceWrapper]' = ServiceWrapper):
+    def create_service(
+        self,
+        service_cls: 'Type[Service]',
+        start_args: 'Tuple' = (),
+        service_wrapper_cls: 'Type[ServiceWrapper]' = ServiceWrapper
+    ):
         service_wrapper = service_wrapper_cls(service_cls, start_args)
         self.yapapi_connector.create_instance(service_wrapper)
         self.service_wrappers.append(service_wrapper)
