@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 class YapapiConnector():
-    def __init__(self, executor_cfg: dict, exception_handler: 'Callable[[ServiceManager, Exception], Awaitable[None]]'):
+    def __init__(self, executor_cfg: dict, exception_handler: 'Callable[[Exception], Awaitable[Any]]'):
         self.executor_cfg = executor_cfg
         self._exception_handler = exception_handler
 
