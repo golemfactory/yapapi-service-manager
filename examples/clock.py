@@ -40,8 +40,8 @@ class ProviderClock(Service):
 async def run_service(service_manager):
     clock = service_manager.create_service(ProviderClock)
 
-    while not clock.started:
-        print("Waiting for the service to start")
+    while clock.status == 'pending':
+        print("Looking for a provider")
         await asyncio.sleep(1)
 
     print("Hey provider, what's the time?")
