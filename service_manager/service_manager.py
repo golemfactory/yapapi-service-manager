@@ -8,7 +8,7 @@ from .yapapi_connector import YapapiConnector
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import Type, List, Tuple, Callable, Awaitable
+    from typing import Type, List, Tuple, Callable, Awaitable, Any
     from yapapi.services import Service
 
 

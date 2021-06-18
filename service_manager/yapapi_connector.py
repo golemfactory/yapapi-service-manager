@@ -3,9 +3,8 @@ import asyncio
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import List, Optional, Callable, Awaitable
+    from typing import List, Optional, Callable, Awaitable, Any
     from .service_wrapper import ServiceWrapper
-    from .service_manager import ServiceManager
 
 
 class YapapiConnector():
