@@ -79,14 +79,14 @@ service_wrapper = service_manager.create_service(
     # This currenly makes sense only for self-contained runtimes --> Erigon example
     start_args=[],
 
-    # Class inheriting from yapapi_service_manager.ServiceWrapper, type of the object
-    # returned by this function. Sample usage --> Erigon example
-    service_wrapper_cls=yapapi_service_manager.ServiceWrapper,
+    # Factory function returning instance of yapapi_service_manager.ServiceWrapper
+    # Sample usage --> Erigon example
+    service_wrapper_factory=yapapi_service_manager.ServiceWrapper,
 )
 
 service_wrapper.stop()   # Stop the service. This terminates the agreement.
-service_wrapper.started  # True -> we've signed an agreement -> service starts (or started)
-service_wrapper.stopped  # True -> something stopped our service_wrapper -> it's not running
+service_wrapper.status   # pending -> starting -> running -> stopping -> stopped
+                         # (also possible-but-not-expected: unresponsive and failed)
 service_wrapper.service  # Instance of service_cls
 
 await service_manager.close()  # Close the Executor, stop all Golem-related work
