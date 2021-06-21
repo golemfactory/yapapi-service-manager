@@ -5,7 +5,7 @@ import shlex
 from yapapi.payload import vm
 from yapapi.services import Service
 
-from service_manager import ServiceManager
+from yapapi_service_manager import ServiceManager
 
 
 class PythonShell(Service):
@@ -49,13 +49,8 @@ async def async_stdin_reader():
 async def run_service(service_manager):
     shell = service_manager.create_service(PythonShell)
 
-    #   TODO
-    #   ServiceWrapper should have a "state" property that would use
-    #   *   started/stopped on SeviceWrapper
-    #   *   service.state
-    #   so this would be prettier.
-    while not shell.started or not shell.service.state.value == 'running':
-        print("Waiting for the service to start")
+    while shell.status != 'running':
+        print(f"Shell is not running yet. Current state: {shell.status}")
         await asyncio.sleep(1)
 
     reader = await async_stdin_reader()

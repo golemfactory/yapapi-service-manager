@@ -15,6 +15,23 @@ class ServiceWrapper():
         self._cluster: 'Optional[Cluster]' = None
 
     @property
+    def status(self):
+        if self.service is not None:
+            service_state = self.service.state.value
+            if service_state == 'terminated':
+                if self.stopped:
+                    return 'stopped'
+                else:
+                    return 'failed'
+            else:
+                return service_state
+        else:
+            if self.stopped:
+                return 'stopped'
+            else:
+                return 'pending'
+
+    @property
     def cluster(self):
         return self._cluster
 
@@ -23,10 +40,6 @@ class ServiceWrapper():
         if self._cluster and self._cluster.instances:
             return self._cluster.instances[0]
         return None
-
-    @property
-    def started(self):
-        return self.service is not None
 
     @cluster.setter
     def cluster(self, cluster: 'Cluster'):
@@ -50,13 +63,6 @@ class ServiceWrapper():
 
         if self.cluster is not None:
             self.cluster.stop()
-
-    async def run_single_command(self, cmd: str):
-        self.service.send_message_nowait(cmd)
-        service_signal = await self.service.receive_message()
-        #   TODO: how do we check if we got response for the signal sent?
-        #         this is irrelevant now, but could be useful in the future
-        return service_signal.message
 
     def _create_id(self):
         return uuid.uuid4().hex
