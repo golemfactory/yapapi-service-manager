@@ -40,7 +40,7 @@ $ python3 examples/clock.py
    
 
 ```
-$ python3 examples/python-shell.py
+$ python3 examples/python_shell.py
 ```
 
 3.  More complex usage: [Erigon](https://github.com/golemfactory/yagna-service-erigon). Features:
