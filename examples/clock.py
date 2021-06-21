@@ -20,9 +20,9 @@ class ProviderClock(Service):
 
     async def run(self):
         while True:
-            #   Q: If we want the datetime, Why not just use standard datetime library?
-            #   A: Because python is running on the **requestor** machine. Data is extracted from provider only
-            #      by means of self._ctx. That's a really important distinction.
+            #   Q: If we want the datetime, why not just use standard datetime library?
+            #   A: Because this python code is running on the **requestor** machine. To execute anything on the
+            #      provider, we need self._ctx.run(). That's a really important distinction.
             self._ctx.run('/bin/date')
             future_result = yield self._ctx.commit()
             all_results = future_result.result()

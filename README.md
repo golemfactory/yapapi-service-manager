@@ -4,22 +4,23 @@ Helper tool for management of [Golem](https://handbook.golem.network/)-based ser
 
 ## yapapi-service-manager vs yapapi
 
-The official Golem python requestor development library is [yapapi](https://github.com/golemfactory/yapapi).
+The official Golem python requestor agent library is [yapapi](https://github.com/golemfactory/yapapi).
 `yayapi` is used internally in `yapapi-service-manager`, so there's exactly nothing this library can do that is not available in pure `yapapi`.
 
 `yapapi-service-manager` provides a higher-level services API than `yapapi`. Main features:
 
 * create/destroy services on demand
-* persistent wrapper objects that are created before agreement is signed & stay after it was terminated
-* most of the interface is `sync` (although this is still an `async` library that will not work when called in non-async context)
+* service wrapper objects that are created before agreement is signed & stay after it was terminated
+* fire-and-forget methods with synchronous interface (although this is still an `async` library that will not work when called in non-async context)
 
-On the other hand, if you need either one of
+There are a lot of features available in `yapapi` but not in `yagna-service-manager`. 
+If you need either one of:
 
 * [task API](https://handbook.golem.network/requestor-tutorials/task-processing-development)
 * efficient way of spawning multiple services in [clusters](https://handbook.golem.network/yapapi/api-reference#cluster-objects)
 * stable backward-compatible API & support
 
-than you should use `yapapi`.
+than you should use pure `yapapi`.
 
 Note: this library changes the way services are *managed*, but the way they are *defined* is exactly the same as in `yapapi`.
 
@@ -69,14 +70,14 @@ service_manager = ServiceManager(
     log_file='log.log',
 )
 
-#   Request service creation. From yapapi POV, this is equivalent of 
+#   Request service creation. From the yapapi POV, this is equivalent to
 #   https://handbook.golem.network/yapapi/api-reference#run_service (with num_instances = 1)
 service_wrapper = service_manager.create_service(
     # Service implementation, class inheriting from yapapi.services.Service
     service_cls,
     
     # Arguments that will be passed to the runtime start.
-    # This currenly makes sense only for self-contained runtimes --> Erigon example
+    # This currenly makes sense only for custom runtimes --> Erigon example
     start_args=[],
 
     # Factory function returning instance of yapapi_service_manager.ServiceWrapper
