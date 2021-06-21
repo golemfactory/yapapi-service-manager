@@ -64,13 +64,6 @@ class ServiceWrapper():
         if self.cluster is not None:
             self.cluster.stop()
 
-    async def run_single_command(self, cmd: str):
-        self.service.send_message_nowait(cmd)
-        service_signal = await self.service.receive_message()
-        #   TODO: how do we check if we got response for the signal sent?
-        #         this is irrelevant now, but could be useful in the future
-        return service_signal.message
-
     def _create_id(self):
         return uuid.uuid4().hex
 
