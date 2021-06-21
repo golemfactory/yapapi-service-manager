@@ -36,9 +36,9 @@ class ServiceManager():
         self,
         service_cls: 'Type[Service]',
         start_args: 'Tuple' = (),
-        service_wrapper_cls: 'Type[ServiceWrapper]' = ServiceWrapper
-    ):
-        service_wrapper = service_wrapper_cls(service_cls, start_args)
+        service_wrapper_factory: 'Callable[[Type[Service], Tuple], ServiceWrapper]' = ServiceWrapper
+    ) -> ServiceWrapper:
+        service_wrapper = service_wrapper_factory(service_cls, start_args)
         self.yapapi_connector.create_instance(service_wrapper)
         self.service_wrappers.append(service_wrapper)
         return service_wrapper
