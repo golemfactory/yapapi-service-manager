@@ -13,9 +13,9 @@ class ProviderClock(Service):
 
     @classmethod
     async def get_payload(cls):
-        #   We use a "standard" yapapi blender image (because every provider has it downloaded)
-        #   Could be any other working image, the only requirement is /bin/date command
-        image_hash = "9a3b5d67b0b27746283cb5f287c13eab1beaa12d92a9f536b747c7ae"
+        #   This image was built from a minimal linux: https://hub.docker.com/_/alpine
+        #   (all we need is /bin/date)
+        image_hash = "badec819d8b00cee2419abed154d4b036d8f66f3e0c040ff22d52b03"
         return await vm.repo(image_hash=image_hash)
 
     async def run(self):
