@@ -53,6 +53,8 @@ $ python3 examples/python_shell.py
 
 
 ```python
+from yapapi_service_manager import ServiceManager
+
 #   Initialize the ServiceManager. You should never have more than one active ServiceManager.
 service_manager = ServiceManager(
     # Dictionary with yapapi.Executor config (TODO: link yayapi executor config docs)
@@ -60,7 +62,7 @@ service_manager = ServiceManager(
     
     # Handler function executed when yapapi.Executor raises an exception
     # Default handler just stops the current event loop
-    golem_exception_handler=service_manager.stop_on_golem_exception,
+    golem_exception_handler=yapapi_service_manager.stop_on_golem_exception,
     
     log_file='log.log',
 )
@@ -75,9 +77,9 @@ service_wrapper = service_manager.create_service(
     # This currenly makes sense only for self-contained runtimes --> Erigon example
     start_args=[],
 
-    # Class inheriting from service_manager.ServiceWrapper, type of the object
+    # Class inheriting from yapapi_service_manager.ServiceWrapper, type of the object
     # returned by this function. Sample usage --> Erigon example
-    service_wrapper_cls=service_manager.ServiceWrapper,
+    service_wrapper_cls=yapapi_service_manager.ServiceWrapper,
 )
 
 service_wrapper.stop()   # Stop the service. This terminates the agreement.

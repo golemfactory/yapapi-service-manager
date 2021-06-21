@@ -3,7 +3,7 @@ import asyncio
 from yapapi.payload import vm
 from yapapi.services import Service
 
-from service_manager import ServiceManager
+from yapapi_service_manager import ServiceManager
 
 
 class ProviderClock(Service):
