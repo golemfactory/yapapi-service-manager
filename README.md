@@ -2,6 +2,12 @@
 
 Helper tool for management of [Golem](https://handbook.golem.network/)-based services.
 
+Installation:
+
+```
+$ pip3 install git+https://github.com/golemfactory/yapapi-service-manager.git
+```
+
 ## yapapi-service-manager vs yapapi
 
 The official Golem python requestor agent library is [yapapi](https://github.com/golemfactory/yapapi).
