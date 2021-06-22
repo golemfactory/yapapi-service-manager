@@ -19,7 +19,7 @@ The official Golem requestor agent library for Python is [yapapi](https://github
 * service wrapper objects that are created before agreement is signed & stay after it was terminated
 * fire-and-forget methods with synchronous interface (although this is still an `async` library that will not work when called in non-async context)
 
-There are a lot of features available in `yapapi` but not in `yagna-service-manager`. 
+There are a lot of features available in `yapapi` but not in `yapapi-service-manager`. 
 If you need either one of:
 
 * [task API](https://handbook.golem.network/requestor-tutorials/task-processing-development)
@@ -55,7 +55,7 @@ $ python3 examples/python_shell.py
 * custom runtime
 * integration with [Quart](https://pgjones.gitlab.io/quart/) http server
 
-Detailed description of this example is in [Golem handbook](https://handbook.golem.network/requestor-tutorials/service-development/service-example-2-erigon)
+Detailed description of this example is in the [Golem handbook](https://handbook.golem.network/requestor-tutorials/service-development/service-example-2-erigon).
     
 
 ## Quickstart
@@ -103,6 +103,6 @@ await service_manager.close()  # Close the Executor, stop all Golem-related work
 
 1. If a service is created when all providers are busy, it should start when any provider ends the current job and becomes available, but it never starts.
 2. If the service fails to start (for whatever reason - e.g. bug in `start()` method), `ServiceWrapper` will forever stay `started`, but not working.
-3. If the provider terminates the agreement (again, for whatever reason - e.g. because our budget runs out and we stop accepting invoices), this information is not propagated & again we are left with a `started` service that is not working.
+3. If the provider terminates the agreement (again, for whatever reason - e.g. because our budget runs out and we stop accepting invoices), this information is not propagated & we are left with a `running` service that is not working.
 
 Those issues are hard to fix outside of `yapapi` so we plan to have them addressed as soon as required improvements in `yapapi` are released.
