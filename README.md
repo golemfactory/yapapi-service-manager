@@ -66,7 +66,7 @@ from yapapi_service_manager import ServiceManager
 
 #   Initialize the ServiceManager. You should never have more than one active ServiceManager.
 service_manager = ServiceManager(
-    # Dictionary with yapapi.Executor config (https://handbook.golem.network/yapapi/api-reference#__init__-5)
+    # Dictionary with yapapi.Golem config (https://handbook.golem.network/yapapi/api-reference#_engine-objects)
     executor_cfg,  
     
     # Handler function executed when yapapi.Executor raises an exception
