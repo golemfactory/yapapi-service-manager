@@ -14,7 +14,7 @@ setuptools.setup(
     url="https://handbook.golem.network/yapapi/",
     download_url="https://github.com/golemfactory/yapapi-service-manager",
     packages=setuptools.find_packages(),
-    install_requires=["yapapi==0.6.0",],
+    install_requires=["yapapi==0.6.1",],
     classifiers=[
         "Development Status :: 0 - Alpha",
         "Framework :: YaPaPI",
