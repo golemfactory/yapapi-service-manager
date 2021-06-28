@@ -101,8 +101,9 @@ await service_manager.close()  # Close the Executor, stop all Golem-related work
 
 ## Known issues
 
-1. If a new service is requested (i.e. an instance of ServiceWrapper is created) when all providers are busy, it should start when any provider ends the current job and becomes available, but it never starts.
-2. If the service fails to start (for whatever reason - e.g. bug in `start()` method), `ServiceWrapper` will forever stay `started`, but not working.
-3. If the provider terminates the agreement (again, for whatever reason - e.g. because our budget runs out and we stop accepting invoices), this information is not propagated & we are left with a `running` service that is not working.
+1. If the service fails to start/stop (for whatever reason - e.g. bug in the `start()` method), `ServiceWrapper` will forever stay in the `starting`/`stopping` state.
+2. If the provider terminates the agreement (again, for whatever reason - e.g. because our budget runs out and we stop accepting invoices), this information is not propagated & we are left with a `running` service that is not working.
 
 Those issues are hard to fix outside of `yapapi` so we plan to have them addressed as soon as required improvements in `yapapi` are released.
+
+Also check [issues](https://github.com/golemfactory/yapapi-service-manager/issues) for the most up-to-date list of known bugs.
