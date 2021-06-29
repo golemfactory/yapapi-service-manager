@@ -2,28 +2,35 @@
 
 Helper tool for management of [Golem](https://handbook.golem.network/)-based services.
 
+Installation:
+
+```
+$ pip3 install git+https://github.com/golemfactory/yapapi-service-manager.git
+```
+
 ## yapapi-service-manager vs yapapi
 
-The official Golem python requestor development library is [yapapi](https://github.com/golemfactory/yapapi).
+The official Golem requestor agent library for Python is [yapapi](https://github.com/golemfactory/yapapi).
 `yayapi` is used internally in `yapapi-service-manager`, so there's exactly nothing this library can do that is not available in pure `yapapi`.
 
 `yapapi-service-manager` provides a higher-level services API than `yapapi`. Main features:
 
 * create/destroy services on demand
-* persistent wrapper objects that are created before agreement is signed & stay after it was terminated
-* most of the interface is `sync` (although this is still an `async` library that will not work when called in non-async context)
+* service wrapper objects that are created before agreement is signed & stay after it was terminated
+* fire-and-forget methods with synchronous interface (although this is still an `async` library that will not work when called in non-async context)
 
-On the other hand, if you need either one of
+There are a lot of features available in `yapapi` but not in `yapapi-service-manager`. 
+If you need either one of:
 
 * [task API](https://handbook.golem.network/requestor-tutorials/task-processing-development)
 * efficient way of spawning multiple services in [clusters](https://handbook.golem.network/yapapi/api-reference#cluster-objects)
 * stable backward-compatible API & support
 
-than you should use `yapapi`.
+then, you should use pure `yapapi`.
 
-Note: this library changes the way services are *managed*, but the way they are *defined* is exactly the same as in `yapapi`.
+Note: This library changes the way services are *managed*, but the way they are *defined* is exactly the same as in `yapapi`.
 
-More general, this library should be considered a temporary stage in requestor API development.
+More generally, this library should be considered a temporary stage in requestor API development.
 In the long term, `yapapi-service-manager` will either be merged into `yapapi` (with possible serious API changes) or abandoned.
 
 
@@ -48,7 +55,7 @@ $ python3 examples/python_shell.py
 * custom runtime
 * integration with [Quart](https://pgjones.gitlab.io/quart/) http server
 
-Detailed description of this example is in [Golem handbook](https://handbook.golem.network/requestor-tutorials/service-development/service-example-2-erigon)
+Detailed description of this example is in the [Golem handbook](https://handbook.golem.network/requestor-tutorials/service-development/service-example-2-erigon).
     
 
 ## Quickstart
@@ -59,7 +66,7 @@ from yapapi_service_manager import ServiceManager
 
 #   Initialize the ServiceManager. You should never have more than one active ServiceManager.
 service_manager = ServiceManager(
-    # Dictionary with yapapi.Executor config (https://handbook.golem.network/yapapi/api-reference#__init__-5)
+    # Dictionary with yapapi.Golem config (https://handbook.golem.network/yapapi/api-reference#_engine-objects)
     executor_cfg,  
     
     # Handler function executed when yapapi.Executor raises an exception
@@ -69,14 +76,14 @@ service_manager = ServiceManager(
     log_file='log.log',
 )
 
-#   Request service creation. From yapapi POV, this is equivalent of 
+#   Request service creation. From the yapapi POV, this is equivalent to
 #   https://handbook.golem.network/yapapi/api-reference#run_service (with num_instances = 1)
 service_wrapper = service_manager.create_service(
     # Service implementation, class inheriting from yapapi.services.Service
     service_cls,
     
     # Arguments that will be passed to the runtime start.
-    # This currenly makes sense only for self-contained runtimes --> Erigon example
+    # This currenly makes sense only for custom runtimes --> Erigon example
     start_args=[],
 
     # Factory function returning instance of yapapi_service_manager.ServiceWrapper
@@ -94,8 +101,9 @@ await service_manager.close()  # Close the Executor, stop all Golem-related work
 
 ## Known issues
 
-1. If a service is created when all providers are busy, it should start when any provider ends the current job and becomes available, but it never starts.
-2. If the service fails to start (for whatever reason - e.g. bug in `start()` method), `ServiceWrapper` will forever stay `started`, but not working.
-3. If the provider terminates the agreement (again, for whatever reason - e.g. because our budget run out and we don't accept invoices), this information is not propagated & again we are left with a `started` service that is not working.
+1. If the service fails to start/stop (for whatever reason - e.g. bug in the `start()` method), `ServiceWrapper` will forever stay in the `starting`/`stopping` state.
+2. If the provider terminates the agreement (again, for whatever reason - e.g. because our budget runs out and we stop accepting invoices), this information is not propagated & we are left with a `running` service that is not working.
 
-Those issues are hard to fix with the latest `yapapi` but we plan to fix them as soon as required improvements are released.
+Those issues are hard to fix outside of `yapapi` so we plan to have them addressed as soon as required improvements in `yapapi` are released.
+
+Also check [issues](https://github.com/golemfactory/yapapi-service-manager/issues) for the most up-to-date list of known bugs.
