@@ -62,7 +62,7 @@ class YapapiConnector():
         cluster = await golem.run_service(service_wrapper.service_cls)
 
         #   TODO: this will change when yapapi issue 372 is fixed
-        cluster.instance_start_args = service_wrapper.start_args
+        cluster.instance_start_args = service_wrapper.start_args  # type: ignore
 
         #   TODO: this will be removed when yapapi issue 461 is fixed
         #         (currently the cluster is "fully operable" only after all instances started)

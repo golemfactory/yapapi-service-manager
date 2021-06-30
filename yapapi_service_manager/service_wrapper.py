@@ -35,12 +35,6 @@ class ServiceWrapper():
     def cluster(self):
         return self._cluster
 
-    @property
-    def service(self):
-        if self._cluster and self._cluster.instances:
-            return self._cluster.instances[0]
-        return None
-
     @cluster.setter
     def cluster(self, cluster: 'Cluster'):
         #   TODO: change to a public attribute when it is available in yapapi
@@ -54,6 +48,12 @@ class ServiceWrapper():
             cluster.stop()
 
         self._cluster = cluster
+
+    @property
+    def service(self):
+        if self._cluster and self._cluster.instances:
+            return self._cluster.instances[0]
+        return None
 
     def stop(self):
         if self.stopped:

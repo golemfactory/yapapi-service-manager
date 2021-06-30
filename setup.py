@@ -1,4 +1,4 @@
-import setuptools
+import setuptools  # type: ignore
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -14,7 +14,8 @@ setuptools.setup(
     url="https://handbook.golem.network/yapapi/",
     download_url="https://github.com/golemfactory/yapapi-service-manager",
     packages=setuptools.find_packages(),
-    install_requires=["yapapi==0.6.1",],
+    package_data={'yapapi_service_manager': ['py.typed']},
+    install_requires=["yapapi==0.6.1"],
     classifiers=[
         "Development Status :: 0 - Alpha",
         "Framework :: YaPaPI",
