@@ -1,13 +1,14 @@
-from yapapi import Golem
 import asyncio
-
 from typing import TYPE_CHECKING
+
+from yapapi import Golem
+
 if TYPE_CHECKING:
     from typing import List, Optional, Callable, Awaitable, Any
     from .service_wrapper import ServiceWrapper
 
 
-class YapapiConnector():
+class YapapiConnector:
     def __init__(self, executor_cfg: dict, exception_handler: 'Callable[[Exception], Awaitable[Any]]'):
         self.executor_cfg = executor_cfg
         self._exception_handler = exception_handler
@@ -38,7 +39,7 @@ class YapapiConnector():
     async def run(self):
         try:
             await self._run_golem()
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             await self._exception_handler(e)
 
     async def _run_golem(self):
@@ -51,12 +52,12 @@ class YapapiConnector():
             )
             while True:
                 data = await self.command_queue.get()
-                if type(data) is str:
+                if isinstance(data, str):
                     assert data == 'CLOSE'
                     break
-                else:
-                    run_service = asyncio.create_task(self._run_service(golem, data))
-                    self.run_service_tasks.append(run_service)
+
+                run_service = asyncio.create_task(self._run_service(golem, data))
+                self.run_service_tasks.append(run_service)
 
     async def _run_service(self, golem: Golem, service_wrapper: 'ServiceWrapper'):
         cluster = await golem.run_service(service_wrapper.service_cls)

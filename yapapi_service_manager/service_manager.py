@@ -1,25 +1,25 @@
 import asyncio
 from functools import partial
+from typing import TYPE_CHECKING
 
 from yapapi.log import enable_default_logger
 
 from .service_wrapper import ServiceWrapper
 from .yapapi_connector import YapapiConnector
 
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Type, List, Tuple, Callable, Awaitable, Any
     from yapapi.services import Service
 
 
-async def stop_on_golem_exception(service_manager: 'ServiceManager', e: Exception) -> None:
+async def stop_on_golem_exception(_service_manager: 'ServiceManager', e: Exception) -> None:
     print("GOLEM FAILED\n", e)
     print("STOPPING THE LOOP")
     loop = asyncio.get_event_loop()
     loop.stop()
 
 
-class ServiceManager():
+class ServiceManager:
     def __init__(
         self,
         executor_cfg: dict,
