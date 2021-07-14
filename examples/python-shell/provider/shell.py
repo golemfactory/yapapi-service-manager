@@ -18,7 +18,7 @@ def cli():
 def run() -> None:
     async def _run():
         print("Spawning Python subprocess...")
-        proc = await asyncio.subprocess.create_subprocess_shell(
+        proc = await asyncio.subprocess.create_subprocess_shell(  # pylint: disable=no-member
             "python3 -i -q",
             stdin=asyncio.subprocess.PIPE,
             stdout=asyncio.subprocess.PIPE,
@@ -52,7 +52,7 @@ def run() -> None:
 async def forward_input(writer: asyncio.StreamWriter) -> None:
     print(f"Forwarding input from {INPUT_SOCKET_ADDR}...")
     context = zmq.asyncio.Context()
-    socket = context.socket(zmq.REP)
+    socket = context.socket(zmq.constants.REP)
     socket.bind(INPUT_SOCKET_ADDR)
     while True:
         data: bytes = await socket.recv()
@@ -65,7 +65,7 @@ async def forward_input(writer: asyncio.StreamWriter) -> None:
 async def forward_output(reader: asyncio.StreamReader) -> None:
     print(f"Forwarding output to {OUTPUT_SOCKET_ADDR}...")
     context = zmq.asyncio.Context()
-    socket = context.socket(zmq.REP)
+    socket = context.socket(zmq.constants.REP)
     socket.bind(OUTPUT_SOCKET_ADDR)
     while True:
         await socket.recv()
@@ -78,7 +78,7 @@ async def forward_output(reader: asyncio.StreamReader) -> None:
 def write() -> None:
     line = sys.stdin.readline()
     context = zmq.Context()
-    socket = context.socket(zmq.REQ)
+    socket = context.socket(zmq.constants.REQ)
     socket.connect(INPUT_SOCKET_ADDR)
     socket.send(line.encode())
     socket.recv()
@@ -87,7 +87,7 @@ def write() -> None:
 @cli.command()
 def read() -> None:
     context = zmq.Context()
-    socket = context.socket(zmq.REQ)
+    socket = context.socket(zmq.constants.REQ)
     socket.connect(OUTPUT_SOCKET_ADDR)
     socket.send(b'')
     data: bytes = socket.recv()
