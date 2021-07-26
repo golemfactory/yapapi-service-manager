@@ -1,5 +1,6 @@
 import asyncio
 from typing import TYPE_CHECKING
+from functools import wraps
 
 from yapapi import Golem
 
@@ -8,10 +9,20 @@ if TYPE_CHECKING:
     from .service_wrapper import ServiceWrapper
 
 
+def with_exception_handler(f):
+    @wraps(f)
+    async def wrapped(self, *args, **kwargs):
+        try:
+            return await f(self, *args, **kwargs)
+        except Exception as e:  # pylint: disable=broad-except
+            await self.exception_handler(e)
+    return wrapped
+
+
 class YapapiConnector:
     def __init__(self, executor_cfg: dict, exception_handler: 'Callable[[Exception], Awaitable[Any]]'):
         self.executor_cfg = executor_cfg
-        self._exception_handler = exception_handler
+        self.exception_handler = exception_handler
 
         self.command_queue: 'asyncio.Queue' = asyncio.Queue()
         self.run_service_tasks: 'List[asyncio.Task]' = []
@@ -36,13 +47,8 @@ class YapapiConnector:
             #   TODO: is this really necessary?
             await self.executor_task
 
+    @with_exception_handler
     async def run(self):
-        try:
-            await self._run_golem()
-        except Exception as e:  # pylint: disable=broad-except
-            await self._exception_handler(e)
-
-    async def _run_golem(self):
         async with Golem(**self.executor_cfg) as golem:
             subnet_tag = self.executor_cfg.get('subnet_tag', '')
             print(
@@ -59,6 +65,7 @@ class YapapiConnector:
                 run_service = asyncio.create_task(self._run_service(golem, data))
                 self.run_service_tasks.append(run_service)
 
+    @with_exception_handler
     async def _run_service(self, golem: Golem, service_wrapper: 'ServiceWrapper'):
         cluster = await golem.run_service(service_wrapper.service_cls)
 
