@@ -89,12 +89,18 @@ service_wrapper = service_manager.create_service(
     # Factory function returning instance of yapapi_service_manager.ServiceWrapper
     # Sample usage --> Erigon example
     service_wrapper_factory=yapapi_service_manager.ServiceWrapper,
+
+    # Attach service to this network (object created by service_wrapper.create_network)
+    # NOTE: service_cls.payload() should require a VPN capability for this to work
+    network=network
 )
 
 service_wrapper.stop()   # Stop the service. This terminates the agreement.
 service_wrapper.status   # pending -> starting -> running -> stopping -> stopped
                          # (also possible-but-not-expected: unresponsive and failed)
 service_wrapper.service  # Instance of service_cls
+
+await service_wrapper.create_network(ip, **kwargs)  # redirects to `yapapi.Golem.create_network`
 
 await service_manager.close()  # Close the Executor, stop all Golem-related work
 ```

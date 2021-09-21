@@ -27,11 +27,20 @@ class YapapiConnector:
         self.command_queue: 'asyncio.Queue' = asyncio.Queue()
         self.run_service_tasks: 'List[asyncio.Task]' = []
         self.executor_task: 'Optional[asyncio.Task]' = None
+        self.golem: 'Optional[Golem]' = None
 
     def create_instance(self, service_wrapper: 'ServiceWrapper'):
         if self.executor_task is None:
             self.executor_task = asyncio.create_task(self.run())
         self.command_queue.put_nowait(service_wrapper)
+
+    async def create_network(self, ip: str, **kwargs):
+        #   TODO: this implementation is ugly. Consider a better one.
+        if self.executor_task is None:
+            self.executor_task = asyncio.create_task(self.run())
+        while self.golem is None:
+            await asyncio.sleep(1)
+        return await self.golem.create_network(ip, **kwargs)
 
     async def stop(self):
         #   Remove all sheduled services from queue and stop Executor task generator
@@ -50,6 +59,7 @@ class YapapiConnector:
     @with_exception_handler
     async def run(self):
         async with Golem(**self.executor_cfg) as golem:
+            self.golem = golem
             subnet_tag = self.executor_cfg.get('subnet_tag', '')
             print(
                 f"Using subnet: {subnet_tag}  "
@@ -67,7 +77,10 @@ class YapapiConnector:
 
     @with_exception_handler
     async def _run_service(self, golem: Golem, service_wrapper: 'ServiceWrapper'):
-        cluster = await golem.run_service(service_wrapper.service_cls)
+        cluster = await golem.run_service(
+            service_wrapper.service_cls,
+            network=service_wrapper.network
+        )
 
         #   TODO: this will change when yapapi issue 372 is fixed
         cluster.instance_start_args = service_wrapper.start_args  # type: ignore

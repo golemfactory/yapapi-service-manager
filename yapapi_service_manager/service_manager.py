@@ -8,8 +8,9 @@ from .service_wrapper import ServiceWrapper
 from .yapapi_connector import YapapiConnector
 
 if TYPE_CHECKING:
-    from typing import Type, List, Tuple, Callable, Awaitable, Any
+    from typing import Type, List, Tuple, Callable, Awaitable, Any, Optional
     from yapapi.services import Service
+    from yapapi.network import Network
 
 
 async def stop_on_golem_exception(_service_manager: 'ServiceManager', e: Exception) -> None:
@@ -36,12 +37,17 @@ class ServiceManager:
         self,
         service_cls: 'Type[Service]',
         start_args: 'Tuple' = (),
-        service_wrapper_factory: 'Callable[[Type[Service], Tuple], ServiceWrapper]' = ServiceWrapper
+        service_wrapper_factory: 'Callable[[Type[Service], Tuple], ServiceWrapper]' = ServiceWrapper,
+        network: 'Optional[Network]' = None
     ) -> ServiceWrapper:
         service_wrapper = service_wrapper_factory(service_cls, start_args)
+        service_wrapper.network = network
         self.yapapi_connector.create_instance(service_wrapper)
         self.service_wrappers.append(service_wrapper)
         return service_wrapper
+
+    async def create_network(self, ip: str, **kwargs):
+        return await self.yapapi_connector.create_network(ip, **kwargs)
 
     async def close(self):
         for service_wrapper in self.service_wrappers:
