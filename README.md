@@ -100,7 +100,7 @@ service_wrapper.status   # pending -> starting -> running -> stopping -> stopped
                          # (also possible-but-not-expected: unresponsive and failed)
 service_wrapper.service  # Instance of service_cls
 
-await service_wrapper.create_network(ip, **kwargs)  # redirects to `yapapi.Golem.create_network`
+await service_manager.create_network(ip, **kwargs)  # redirects to `yapapi.Golem.create_network`
 
 await service_manager.close()  # Close the Executor, stop all Golem-related work
 ```
