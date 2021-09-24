@@ -79,7 +79,7 @@ class YapapiConnector:
     async def _run_service(self, golem: Golem, service_wrapper: 'ServiceWrapper'):
         cluster = await golem.run_service(
             service_wrapper.service_cls,
-            network=service_wrapper.network
+            **service_wrapper.run_service_params,
         )
 
         #   TODO: this will change when yapapi issue 372 is fixed

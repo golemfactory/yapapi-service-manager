@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Type, Tuple, Optional
     from yapapi.services import Service, Cluster
-    from yapapi.network import Network
 
 
 class ServiceWrapper:
@@ -14,7 +13,7 @@ class ServiceWrapper:
         self.id = self._create_id()
         self.stopped = False
         self._cluster: 'Optional[Cluster]' = None
-        self.network: 'Optional[Network]' = None
+        self.run_service_params: dict = {}
 
     @property
     def status(self):
