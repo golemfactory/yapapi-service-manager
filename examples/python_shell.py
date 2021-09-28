@@ -17,6 +17,8 @@ class PythonShell(Service):
         return await vm.repo(image_hash=image_hash)
 
     async def start(self):
+        async for script in super().start():
+            yield script
         print(f"Initializing shell on provider {self.provider_name}, wait for prompt ...")
         self._ctx.run('/bin/sh', '-c', 'nohup python shell.py run &')
         yield self._ctx.commit()
