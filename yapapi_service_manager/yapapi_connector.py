@@ -45,6 +45,7 @@ class YapapiConnector:
         await self.golem.start()
         cluster = await self.golem.run_service(
             service_wrapper.service_cls,
+            num_instances=1,
             **service_wrapper.run_service_params,
         )
 
