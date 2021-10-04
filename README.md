@@ -81,10 +81,6 @@ service_manager = ServiceManager(
 service_wrapper = service_manager.create_service(
     # Service implementation, class inheriting from yapapi.services.Service
     service_cls,
-    
-    # Arguments that will be passed to the runtime start.
-    # This currenly makes sense only for custom runtimes --> Erigon example
-    start_args=[],
 
     # Factory function returning instance of yapapi_service_manager.ServiceWrapper
     # Sample usage --> Erigon example
