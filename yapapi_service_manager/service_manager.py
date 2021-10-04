@@ -8,7 +8,7 @@ from .service_wrapper import ServiceWrapper
 from .yapapi_connector import YapapiConnector
 
 if TYPE_CHECKING:
-    from typing import Type, List, Tuple, Callable, Awaitable, Any, Optional
+    from typing import Type, List, Callable, Awaitable, Any, Optional
     from yapapi.services import Service
 
 
@@ -35,11 +35,10 @@ class ServiceManager:
     def create_service(
         self,
         service_cls: 'Type[Service]',
-        start_args: 'Tuple' = (),
-        service_wrapper_factory: 'Callable[[Type[Service], Tuple], ServiceWrapper]' = ServiceWrapper,
+        service_wrapper_factory: 'Callable[[Type[Service]], ServiceWrapper]' = ServiceWrapper,
         run_service_params: 'Optional[dict]' = None,
     ) -> ServiceWrapper:
-        service_wrapper = service_wrapper_factory(service_cls, start_args)
+        service_wrapper = service_wrapper_factory(service_cls)
         if run_service_params is not None:
             service_wrapper.run_service_params = run_service_params
         self.yapapi_connector.create_instance(service_wrapper)

@@ -49,12 +49,4 @@ class YapapiConnector:
             **service_wrapper.run_service_params,
         )
 
-        #   TODO: https://github.com/golemfactory/yapapi-service-manager/issues/15
-        cluster.instance_start_args = service_wrapper.start_args  # type: ignore
-
-        #   TODO: this will be removed when yapapi issue 461 is fixed
-        #         (currently the cluster is "fully operable" only after all instances started)
-        while not cluster.instances:
-            await asyncio.sleep(0.1)
-
         service_wrapper.cluster = cluster
