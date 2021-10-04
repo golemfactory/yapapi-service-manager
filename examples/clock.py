@@ -22,17 +22,14 @@ class ProviderClock(Service):
         while True:
             #   Q: If we want the datetime, why not just use standard datetime library?
             #   A: Because this python code is running on the **requestor** machine. To execute anything on the
-            #      provider, we need self._ctx.run(). That's a really important distinction.
-            self._ctx.run('/bin/date')
-            future_result = yield self._ctx.commit()
-            all_results = future_result.result()
+            #      provider, we need script.run(). That's a really important distinction.
+            script = self._ctx.new_script()
+            run_date = script.run('/bin/date')
+            yield script
 
-            #   all_results might contain also results of deploy() and start() operations (for the first iteration)
-            #   but this particular operation is always last
-            this_result = all_results[-1]
-            date_time = this_result.stdout.strip()
-
+            date_time = run_date.result().stdout.strip()
             print(f"My name is {self.provider_name} and my time is {date_time}")
+
             self.command_executed_cnt += 1
             await asyncio.sleep(1)
 
@@ -56,7 +53,7 @@ async def run_service(service_manager):
 
 def main():
     executor_cfg = {
-        'subnet_tag': 'devnet-beta.2',
+        'subnet_tag': 'devnet-beta',
         'budget': 1,
     }
     service_manager = ServiceManager(executor_cfg)

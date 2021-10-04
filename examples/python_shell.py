@@ -20,24 +20,30 @@ class PythonShell(Service):
         async for script in super().start():
             yield script
         print(f"Initializing shell on provider {self.provider_name}, wait for prompt ...")
-        self._ctx.run('/bin/sh', '-c', 'nohup python shell.py run &')
-        yield self._ctx.commit()
+
+        script = self._ctx.new_script()
+        script.run('/bin/sh', '-c', 'nohup python shell.py run &')
+        yield script
+
         print("Python shell is ready.")
 
     async def run(self):
         while True:
             #   Print python shell output
-            self._ctx.run('/usr/local/bin/python', 'shell.py', 'read')
-            future_results = yield self._ctx.commit()
-            result = future_results.result()[-1]
-            print(result.stdout, end='', flush=True)
+            read_script = self._ctx.new_script()
+            run_shell = read_script.run('/usr/local/bin/python', 'shell.py', 'read')
+            yield read_script
+
+            print(run_shell.result().stdout, end='', flush=True)
 
             #   Pass command to shell
             signal = await self._listen()
             cmd = signal.message
             cmd = shlex.quote(cmd)
-            self._ctx.run('/bin/sh', '-c', f"echo {cmd} | python shell.py write")
-            yield self._ctx.commit()
+
+            write_script = self._ctx.new_script()
+            write_script.run('/bin/sh', '-c', f"echo {cmd} | python shell.py write")
+            yield write_script
 
 
 async def async_stdin_reader():
@@ -64,7 +70,7 @@ async def run_service(service_manager):
 
 def main():
     executor_cfg = {
-        'subnet_tag': 'devnet-beta.2',
+        'subnet_tag': 'devnet-beta',
         'budget': 1,
     }
     service_manager = ServiceManager(executor_cfg)
