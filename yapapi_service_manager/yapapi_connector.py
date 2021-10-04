@@ -49,9 +49,4 @@ class YapapiConnector:
             **service_wrapper.run_service_params,
         )
 
-        #   TODO: this will be removed when yapapi issue 461 is fixed
-        #         (currently the cluster is "fully operable" only after all instances started)
-        while not cluster.instances:
-            await asyncio.sleep(0.1)
-
         service_wrapper.cluster = cluster
