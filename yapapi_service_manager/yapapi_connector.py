@@ -26,7 +26,7 @@ class YapapiConnector:
         self.run_service_tasks: 'List[asyncio.Task]' = []
 
     def create_instance(self, service_wrapper: 'ServiceWrapper'):
-        run_service = asyncio.create_task(self.run_service(service_wrapper))
+        run_service = asyncio.get_event_loop().create_task(self.run_service(service_wrapper))
         self.run_service_tasks.append(run_service)
 
     async def stop(self):
