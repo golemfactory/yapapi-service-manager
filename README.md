@@ -81,20 +81,23 @@ service_manager = ServiceManager(
 service_wrapper = service_manager.create_service(
     # Service implementation, class inheriting from yapapi.services.Service
     service_cls,
-    
-    # Arguments that will be passed to the runtime start.
-    # This currenly makes sense only for custom runtimes --> Erigon example
-    start_args=[],
 
     # Factory function returning instance of yapapi_service_manager.ServiceWrapper
     # Sample usage --> Erigon example
     service_wrapper_factory=yapapi_service_manager.ServiceWrapper,
+    
+    # Optional dictionary of parameters passed directly to Golem.run_service
+    # (e.g. network or instance_params). IMPORTANT NOTE: some params might influence the number
+    # of instances created. This must be avoided, exactly one instance should be always created.
+    run_service_params=None,
 )
 
 service_wrapper.stop()   # Stop the service. This terminates the agreement.
 service_wrapper.status   # pending -> starting -> running -> stopping -> stopped
                          # (also possible-but-not-expected: unresponsive and failed)
 service_wrapper.service  # Instance of service_cls
+
+await service_manager.create_network(ip, **kwargs)  # redirects to `yapapi.Golem.create_network`
 
 await service_manager.close()  # Close the Executor, stop all Golem-related work
 ```
